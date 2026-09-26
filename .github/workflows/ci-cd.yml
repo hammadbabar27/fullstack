@@ -1,0 +1,46 @@
+name: CI/CD - Build, Test, Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # ---------- Job 1: Install deps and run a sanity check ----------
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests (placeholder)
+        run: npm test
+
+  # ---------- Job 2: SSH into EC2, pull latest code, rebuild, restart ----------
+  # No Docker Hub / image registry involved — the image is built directly
+  # on the EC2 server from source.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2 over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/app
+            git pull origin main
+            export DB_USER=${{ secrets.DB_USER }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DB_NAME=${{ secrets.DB_NAME }}
+            export DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
+            docker compose up -d --build
