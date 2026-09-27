@@ -9,31 +9,74 @@ body {
   justify-content: center;
 }
 
-.app {
+.app, .auth-card {
   background: #fff;
   padding: 32px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   width: 100%;
-  max-width: 480px;
+  max-width: 560px;
 }
 
 h1 { margin: 0 0 4px; }
-.subtitle { color: #666; font-size: 13px; margin-bottom: 24px; }
+.subtitle { color: #666; font-size: 13px; margin: 0; }
 
-#task-form {
+.topbar {
   display: flex;
-  gap: 8px;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 20px;
 }
 
-#task-input {
+/* ---- Auth page ---- */
+.auth-wrap { display: flex; justify-content: center; width: 100%; }
+.auth-card { max-width: 380px; }
+.tabs { display: flex; gap: 8px; margin: 16px 0; }
+.tab-btn {
   flex: 1;
+  background: #f1f1f4;
+  color: #444;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+}
+.tab-btn.active { background: #4f46e5; color: white; }
+.auth-form { display: flex; flex-direction: column; gap: 10px; }
+.auth-form.hidden { display: none; }
+.auth-form input {
   padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 14px;
 }
+.error { color: #dc2626; font-size: 13px; min-height: 16px; margin: 0; }
+
+/* ---- Filters ---- */
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filters select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+  flex: 1;
+}
+
+/* ---- Task form ---- */
+#task-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+.form-row { display: flex; gap: 8px; }
+#task-form input, #task-form select {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+#task-title { width: 100%; }
+.form-row select, .form-row input { flex: 1; }
 
 button {
   background: #4f46e5;
@@ -44,27 +87,46 @@ button {
   cursor: pointer;
   font-size: 14px;
 }
-
 button:hover { background: #4338ca; }
 
+.secondary-btn { background: #e5e7eb; color: #333; }
+.secondary-btn:hover { background: #d1d5db; }
+
+/* ---- Task list ---- */
 #task-list { list-style: none; padding: 0; margin: 0; }
 
 #task-list li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 10px;
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid #eee;
 }
+#task-list li.empty { color: #999; justify-content: center; }
 
-#task-list li span {
-  flex: 1;
-}
+.task-main { flex: 1; }
+.task-title-row { display: flex; align-items: center; gap: 8px; }
+.task-title-row input[type="checkbox"] { width: 16px; height: 16px; }
 
-#task-list li.completed span {
+.completed .task-title-row span {
   text-decoration: line-through;
   color: #999;
 }
+
+.task-meta { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.task-meta span {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #eee;
+  color: #333;
+}
+.priority-high { background: #fee2e2 !important; color: #b91c1c !important; }
+.priority-medium { background: #fef3c7 !important; color: #92400e !important; }
+.priority-low { background: #dcfce7 !important; color: #166534 !important; }
+.category { color: white !important; }
+.due-date.overdue { background: #fee2e2 !important; color: #b91c1c !important; }
 
 .delete-btn {
   background: #ef4444;

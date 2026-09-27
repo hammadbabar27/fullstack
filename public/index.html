@@ -8,17 +8,54 @@
 </head>
 <body>
   <div class="app">
-    <h1>📋 Task Manager</h1>
-    <p class="subtitle">Fullstack Node.js + Express + Docker + CI/CD + AWS EC2</p>
+    <div class="topbar">
+      <div>
+        <h1>📋 Task Manager</h1>
+        <p class="subtitle" id="welcome-msg"></p>
+      </div>
+      <button id="logout-btn" class="secondary-btn">Log out</button>
+    </div>
+
+    <div class="filters">
+      <select id="filter-category">
+        <option value="">All categories</option>
+      </select>
+      <select id="filter-priority">
+        <option value="">All priorities</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+      <select id="filter-completed">
+        <option value="">All tasks</option>
+        <option value="false">Pending</option>
+        <option value="true">Completed</option>
+      </select>
+    </div>
 
     <form id="task-form">
-      <input type="text" id="task-input" placeholder="Add a new task..." required />
-      <button type="submit">Add</button>
+      <input type="text" id="task-title" placeholder="Task title..." required />
+      <div class="form-row">
+        <select id="task-category">
+          <option value="">No category</option>
+        </select>
+        <select id="task-priority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select>
+        <input type="date" id="task-due-date" />
+      </div>
+      <div class="form-row">
+        <input type="text" id="new-category-name" placeholder="New category name" />
+        <button type="button" id="add-category-btn">+ Add Category</button>
+      </div>
+      <button type="submit">Add Task</button>
     </form>
 
     <ul id="task-list"></ul>
   </div>
 
-  <script src="/script.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>
