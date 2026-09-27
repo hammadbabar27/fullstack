@@ -2,76 +2,58 @@ name: CI/CD - Build, Test, Security Scan, Deploy
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
   pull_request:
-    branches: ["main"]
+    branches:
+      - main
 
 jobs:
 
-  # =====================================================
-  # JOB 1 - BUILD AND TEST
-  # =====================================================
   build:
-  name: Build & Test
-  runs-on: ubuntu-latest
+    name: Build & Test
+    runs-on: ubuntu-latest
 
-  steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Show Project Files
-      run: |
-        pwd
-        ls -la
+      - name: Show Project Files
+        run: |
+          pwd
+          ls -la
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-    - name: Install Dependencies
-      run: npm install
+      - name: Install Dependencies
+        run: npm install
 
-    - name: Run Tests
-      run: npm test
+      - name: Run Tests
+        run: npm test
 
 
-  # =====================================================
-  # JOB 2 - SECURITY SCANNING
-  # =====================================================
   security:
     name: Security Scanning
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-
-      # Full Git history is useful for secret scanning
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-
-      # -------------------------------------------------
-      # SECURITY TOOL 1 - GITLEAKS
-      # -------------------------------------------------
       - name: Gitleaks Secret Scan
         uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
-      # -------------------------------------------------
-      # Build Docker image for Trivy
-      # -------------------------------------------------
       - name: Build Docker Image
         run: docker build -t fullstack-task-app:${{ github.sha }} .
 
-
-      # -------------------------------------------------
-      # SECURITY TOOL 2 - TRIVY
-      # -------------------------------------------------
       - name: Trivy Vulnerability Scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -82,24 +64,15 @@ jobs:
           exit-code: '1'
 
 
-  # =====================================================
-  # JOB 3 - DEPLOY TO AWS EC2
-  # =====================================================
   deploy:
     name: Deploy to EC2
-
-    # Deployment only happens when security succeeds
     needs: security
-
-    # Don't deploy pull requests
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
     runs-on: ubuntu-latest
 
     steps:
       - name: Deploy to EC2 over SSH
         uses: appleboy/ssh-action@v1.0.3
-
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
