@@ -4,41 +4,32 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
 
-build:
-  name: Build & Test
-  runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-  steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Verify Project Files
+        run: |
+          pwd
+          ls -la
+          test -f package.json
 
-    - name: Verify Files
-      run: |
-        echo "Current directory:"
-        pwd
-        echo "Files:"
-        ls -la
-        echo "Checking package.json:"
-        test -f package.json && echo "package.json FOUND" || exit 1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Install Dependencies
+        run: npm install
 
-    - name: Install Dependencies
-      run: npm install
-
-    - name: Run Tests
-      run: npm test
-
+      - name: Run Tests
+        run: npm test
 
   security:
     name: Security Scanning
@@ -62,17 +53,15 @@ build:
       - name: Trivy Vulnerability Scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: 'fullstack-task-app:${{ github.sha }}'
-          format: 'table'
-          severity: 'HIGH,CRITICAL'
+          image-ref: fullstack-task-app:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: '1'
-
 
   deploy:
     name: Deploy to EC2
     needs: security
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
@@ -82,10 +71,8 @@ build:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-
           script: |
             cd /home/ubuntu/app
-
             git pull origin main
 
             export DB_USER=${{ secrets.DB_USER }}
